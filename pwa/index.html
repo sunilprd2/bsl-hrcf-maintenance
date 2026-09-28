@@ -1,55 +1,6 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07599c">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="stylesheet" href="./styles.css">
-<title>BSL HRCF SANRAKSH</title>
-</head>
-<body>
-<div id="loginView" class="login-wrap">
-  <div class="login-card">
-    <img class="login-logo-img" src="./icon-192.png" alt="BSL HRCF SANRAKSH">
-    <h1>BSL</h1>
-    <div class="login-name">Maintenance Log System</div>
-    <div class="login-subtitle">HRCF • SANRAKSH</div>
-    <div class="field"><label>Staff No</label><div class="input-icon"><span>👤</span><input id="staffNo" class="input" inputmode="numeric" maxlength="6" placeholder="User ID / Number"></div></div>
-    <div class="field"><label>Password</label><div class="input-icon"><span>🔒</span><input id="password" class="input" type="password" placeholder="Password"></div></div>
-    <button id="loginBtn" class="btn primary full login-btn">Login</button>
-    <div id="loginMsg" class="login-msg"></div>
-  </div>
-</div>
-
-<div id="appView" class="app hidden">
-  <header class="topbar">
-    <button class="iconbtn" onclick="openDrawer()" aria-label="Menu">☰</button>
-    <div id="topTitle" class="brand">BSL<small>Maintenance Log System</small></div>
-    <button id="topRight" class="iconbtn" onclick="showSync()" aria-label="Notifications">🔔</button>
-  </header>
-  <div id="net" class="statusbar online">🟢 Online</div>
-  <main id="main" class="page"></main>
-</div>
-
-<div id="drawer" class="drawer hidden" onclick="closeDrawer(event)">
-  <div class="drawer-panel" onclick="event.stopPropagation()">
-    <div class="drawer-brand"><img src="./icon-192.png" alt="BSL"><div><b>BSL</b><span>Maintenance Log</span></div></div>
-    <div id="userMini" class="drawer-user"></div>
-    <div class="nav">
-      <button onclick="home()">⌂ <span>Home</span></button>
-      <button onclick="newEntry()">▣ <span>New Entry</span></button>
-      <button onclick="reports()">▤ <span>View Reports</span></button>
-      <button onclick="equipmentPage()">⚙ <span>Equipment Master</span></button>
-      <button onclick="showSync()">↻ <span>Pending Sync</span></button>
-      <button onclick="dashboard()">▥ <span>Dashboard</span></button>
-      <button onclick="logout()">⇥ <span>Logout</span></button>
-    </div>
-  </div>
-</div>
-<div id="toast" class="toast hidden"></div>
-<script src="./config.js"></script><script src="./app.js"></script>
-</body>
-</html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07599c"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./styles.css"><title>BSL HRCF SANRAKSH</title></head><body>
+<div id="loginView" class="login-wrap"><div class="login-card"><img class="login-logo-img" src="./icon-192.png"><h1>BSL</h1><div class="login-name">Maintenance Log System</div><div class="login-subtitle">HRCF • SANRAKSH</div><div class="field"><label>Staff No</label><div class="input-icon"><span>👤</span><input id="staffNo" inputmode="numeric" maxlength="6" placeholder="Enter 6 digit Staff No"></div></div><div class="field"><label>Password</label><div class="input-icon"><span>🔒</span><input id="password" type="password" placeholder="Password"><button class="eye" onclick="toggleEye()">👁</button></div></div><button id="loginBtn" class="btn primary full">Login</button><div class="login-links"><button onclick="firstTimeSetup()">New User / First Time</button><button onclick="forgotPassword()">Forgot Password?</button></div><div id="loginMsg" class="login-msg"></div></div></div>
+<div id="setupView" class="login-wrap hidden"><div class="setup-card"><img class="setup-logo" src="./icon-192.png"><h2 id="setupTitle">Set Your Password</h2><p>First-time account setup</p><div id="setupMsg" class="login-msg"></div><label>Staff No</label><input id="setupStaff" class="input" maxlength="6"><label>New Password</label><input id="setupPass" class="input" type="password"><label>Confirm Password</label><input id="setupConfirm" class="input" type="password"><div class="requirements"><b>Password rules</b><div id="rqLen">✗ Minimum 8 characters</div><div id="rqUpper">✗ At least one capital letter</div><div id="rqLower">✗ At least one small letter</div><div id="rqNum">✗ At least one number</div><div id="rqSpec">✗ At least one special character</div></div><div class="actions"><button class="btn secondary" onclick="backLogin()">Back</button><button class="btn primary" onclick="createPassword()">Create Password</button></div></div></div>
+<div id="forgotView" class="login-wrap hidden"><div class="setup-card"><img class="setup-logo" src="./icon-192.png"><h2>Forgot Password</h2><p>Submit a password reset request.</p><div id="forgotMsg" class="login-msg"></div><label>Staff No</label><input id="forgotStaff" class="input" maxlength="6" inputmode="numeric"><div class="actions"><button class="btn secondary" onclick="backLogin()">Back</button><button class="btn primary" onclick="sendReset()">Send Request</button></div></div></div>
+<div id="appView" class="app hidden"><header class="topbar"><button class="iconbtn" onclick="openDrawer()">☰</button><div id="topTitle" class="brand">BSL<small>Maintenance Log System</small></div><button class="iconbtn" onclick="showSync()">🔔</button></header><div id="net" class="statusbar online">🟢 Online</div><main id="main" class="page"></main></div>
+<div id="drawer" class="drawer hidden" onclick="closeDrawer(event)"><div class="drawer-panel" onclick="event.stopPropagation()"><div class="drawer-brand"><img src="./icon-192.png"><div><b>BSL HRCF</b><span>SANRAKSH</span></div></div><div id="userMini" class="drawer-user"></div><div class="nav"><button onclick="home()">⌂ <span>Home</span></button><button onclick="newEntry()">▣ <span>Add Log</span></button><button onclick="viewLogs()">☷ <span>View Log</span></button><button onclick="employeePage()">👥 <span>Employee Details</span></button><button onclick="shiftDetailsPage()">🕒 <span>Shift Details</span></button><button onclick="reports()">▤ <span>Reports</span></button><button onclick="equipmentPage()">⚙ <span>Equipment</span></button><button onclick="profilePage()">👤 <span>Profile</span></button><button onclick="aboutPage()">ⓘ <span>About</span></button><button onclick="helpPage()">❓ <span>Help & Feedback</span></button><button onclick="showSync()">↻ <span>Pending Sync</span></button><button onclick="logout()">⇥ <span>Logout</span></button></div></div></div><div id="toast" class="toast hidden"></div><script src="./config.js"></script><script src="./app.js"></script></body></html>
