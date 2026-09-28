@@ -1,7 +1,7 @@
-const CACHE = 'bsl-hrcf-v1';
+const CACHE = 'bsl-hrcf-v3';
 const CORE = [
   './', './index.html', './styles.css', './app.js', './config.js',
-  './manifest.webmanifest', './icon-192.png', './icon-512.png'
+  './manifest.webmanifest', './icon-192.png', './icon-512.png', './industrial-bg.jpg'
 ];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

@@ -1,7 +1,7 @@
 {
-  "name": "BSL (HRCF) Maintenance Log",
-  "short_name": "BSL Maintenance",
-  "description": "BSL HRCF Maintenance Log System",
+  "name": "BSL HRCF SANRAKSH",
+  "short_name": "SANRAKSH",
+  "description": "BSL HRCF SANRAKSH Maintenance Log System",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f4f7fb",
