@@ -9,8 +9,56 @@ $('loginBtn').onclick=login;function openSetup(s){$('loginView').classList.add('
 $('setupPass').oninput=passwordRules;function passwordRules(){let p=$('setupPass').value,tests=[['rqLen',p.length>=8,'Minimum 8 characters'],['rqUpper',/[A-Z]/.test(p),'At least one capital letter'],['rqLower',/[a-z]/.test(p),'At least one small letter'],['rqNum',/[0-9]/.test(p),'At least one number'],['rqSpec',/[^A-Za-z0-9]/.test(p),'At least one special character']];tests.forEach(x=>{$(x[0]).textContent=(x[1]?'✓ ':'✗ ')+x[2];$(x[0]).className=x[1]?'good':''})}async function createPassword(){let s=$('setupStaff').value.trim(),p=$('setupPass').value,c=$('setupConfirm').value;if(p!==c){$('setupMsg').textContent='Passwords do not match.';return}try{let r=await api('setFirstPassword',{staffNo:s,password:p});if(r.success){let l=await api('login',{staffNo:s,password:p});user=l;localStorage.setItem('bslUser',JSON.stringify(l));showApp()}else $('setupMsg').textContent=r.message}catch(e){$('setupMsg').textContent='Connection error.'}}async function sendReset(){let s=$('forgotStaff').value.trim();try{let r=await api('requestPasswordReset',{staffNo:s});$('forgotMsg').textContent=r.message||'Request submitted.'}catch(e){$('forgotMsg').textContent='Connection error.'}}
 function showApp(){$('loginView').classList.add('hidden');$('setupView').classList.add('hidden');$('forgotView').classList.add('hidden');$('appView').classList.remove('hidden');$('userMini').innerHTML=`<b>${esc(user?.name||'Employee')}</b><small>Staff No: ${esc(user?.staffNo||'')}</small>`;setNet();home()}
 function openDrawer(){$('drawer').classList.remove('hidden')}function closeDrawer(e){if(!e||e.target.id==='drawer')$('drawer').classList.add('hidden')}function setHeader(t,s=''){ $('topTitle').innerHTML=`<b>${esc(t)}</b><small>${esc(s)}</small>`}
-async function loadEmployees(){if(employees.length)return employees;try{employees=await api('employees',{},'GET')}catch(e){employees=[]}return employees}function findEmpByName(n){return employees.find(x=>String(x.name).toLowerCase()===String(n).toLowerCase())||employees.find(x=>String(x.name).toLowerCase().includes(String(n).toLowerCase()))||null}
-async function home(){closeDrawer();setHeader('BSL','Maintenance Log System');selectedShift=currentShift();$('main').innerHTML='<div class="loading">Loading dashboard...</div>';try{let [d,crew,emps]=await Promise.all([api('dashboard',{},'GET'),api('shiftCrew',{date:today(),shift:currentShift()},'GET'),loadEmployees()]);let si=findEmpByName(crew.shiftIncharge),li=findEmpByName(crew.lineIncharge);$('main').innerHTML=`<div class="install-hint">📱 <b>Install:</b> Chrome → Add to Home screen</div><div class="shift-grid"><div class="shift-card a ${currentShift()==='A Shift'?'active':''}" onclick="shiftPage('A Shift')"><strong>A</strong><b>SHIFT</b><small>06:00 – 14:00</small><em>${currentShift()==='A Shift'?'ACTIVE':''}</em></div><div class="shift-card b ${currentShift()==='B Shift'?'active':''}" onclick="shiftPage('B Shift')"><strong>B</strong><b>SHIFT</b><small>14:00 – 22:00</small><em>${currentShift()==='B Shift'?'ACTIVE':''}</em></div><div class="shift-card c ${currentShift()==='C Shift'?'active':''}" onclick="shiftPage('C Shift')"><strong>C</strong><b>SHIFT</b><small>22:00 – 06:00</small><em>${currentShift()==='C Shift'?'ACTIVE':''}</em></div></div><div class="crew-card"><h3>Current Shift • ${esc(currentShift())}</h3><div class="crew-grid"><div><b>Shift In-charge</b><p>${esc(crew.shiftIncharge||'Not entered')}</p><small>${esc(si?.mobile||'')}</small></div><div><b>Line In-charge</b><p>${esc(crew.lineIncharge||'Not entered')}</p><small>${esc(li?.mobile||'')}</small></div><div><b>Crew Strength</b><p>TOTAL ${crew.totalCrew||0}</p><small>BSL: ${crew.bslEmployees||0} • Contract: ${crew.contractWorkers||0}</small></div></div></div><div class="quick-grid"><button onclick="reports()">📄<b>Today's Reports</b></button><button onclick="viewLogs()">🔍<b>Search / View Log</b></button><button onclick="dashboard()">📊<b>Dashboard</b></button><button onclick="employeePage()">👥<b>Employee Details</b></button><button onclick="shiftDetailsPage()">🕒<b>Shift Details</b></button><button onclick="aboutPage()">ⓘ<b>About</b></button></div>`}catch(e){$('main').innerHTML='<div class="card">Unable to load dashboard. Check connection.</div>'}}
+async function loadEmployees(){if(employees.length)return employees;try{let r=await api('employees');employees=Array.isArray(r)?r:[]}catch(e){employees=[]}return employees}function findEmpByName(n){return employees.find(x=>String(x.name).toLowerCase()===String(n).toLowerCase())||employees.find(x=>String(x.name).toLowerCase().includes(String(n).toLowerCase()))||null}
+async function home(){
+closeDrawer();
+setHeader('BSL','Maintenance Log System');
+selectedShift=currentShift();
+$('main').innerHTML='<div class="loading">Loading dashboard...</div>';
+
+try{
+  let d={};
+  let crew={};
+  let emps=[];
+
+  try{d=await api('dashboard')}catch(e){console.warn('Dashboard API error:',e)}
+  try{crew=await api('shiftCrew',{date:today(),shift:currentShift()})}catch(e){console.warn('Shift Crew API error:',e)}
+  try{emps=await loadEmployees()}catch(e){console.warn('Employee API error:',e);emps=[]}
+
+  if(!crew||typeof crew!=='object')crew={};
+  if(!Array.isArray(emps))emps=[];
+  employees=emps;
+
+  let si=findEmpByName(crew.shiftIncharge);
+  let li=findEmpByName(crew.lineIncharge);
+
+  $('main').innerHTML=`
+  <div class="install-hint">📱 <b>Install:</b> Chrome → Add to Home screen</div>
+  <div class="shift-grid">
+    <div class="shift-card a ${currentShift()==='A Shift'?'active':''}" onclick="shiftPage('A Shift')"><strong>A</strong><b>SHIFT</b><small>06:00 – 14:00</small><em>${currentShift()==='A Shift'?'ACTIVE':''}</em></div>
+    <div class="shift-card b ${currentShift()==='B Shift'?'active':''}" onclick="shiftPage('B Shift')"><strong>B</strong><b>SHIFT</b><small>14:00 – 22:00</small><em>${currentShift()==='B Shift'?'ACTIVE':''}</em></div>
+    <div class="shift-card c ${currentShift()==='C Shift'?'active':''}" onclick="shiftPage('C Shift')"><strong>C</strong><b>SHIFT</b><small>22:00 – 06:00</small><em>${currentShift()==='C Shift'?'ACTIVE':''}</em></div>
+  </div>
+  <div class="crew-card">
+    <h3>Current Shift • ${esc(currentShift())}</h3>
+    <div class="crew-grid">
+      <div><b>Shift In-charge</b><p>${esc(crew.shiftIncharge||'Not entered')}</p><small>${esc(si?.mobile||'')}</small></div>
+      <div><b>Line In-charge</b><p>${esc(crew.lineIncharge||'Not entered')}</p><small>${esc(li?.mobile||'')}</small></div>
+      <div><b>Crew Strength</b><p>TOTAL ${crew.totalCrew||0}</p><small>BSL: ${crew.bslEmployees||0} • Contract: ${crew.contractWorkers||0}</small></div>
+    </div>
+  </div>
+  <div class="quick-grid">
+    <button onclick="reports()">📄<b>Today's Reports</b></button>
+    <button onclick="viewLogs()">🔍<b>Search / View Log</b></button>
+    <button onclick="dashboard()">📊<b>Dashboard</b></button>
+    <button onclick="employeePage()">👥<b>Employee Details</b></button>
+    <button onclick="shiftDetailsPage()">🕒<b>Shift Details</b></button>
+    <button onclick="aboutPage()">ⓘ<b>About</b></button>
+  </div>`;
+}catch(e){
+  console.error('Home dashboard error:',e);
+  $('main').innerHTML='<div class="card"><h3>Dashboard</h3><p>Dashboard could not be loaded completely.</p><button onclick="home()">🔄 Retry</button></div>';
+}}
 async function shiftPage(shift){closeDrawer();selectedShift=shift;setHeader(shift,shift==='A Shift'?'06:00 – 14:00':shift==='B Shift'?'14:00 – 22:00':'22:00 – 06:00');$('main').innerHTML='<div class="loading">Loading shift details...</div>';let c=await api('shiftCrew',{date:today(),shift},'GET').catch(()=>({}));await loadEmployees();let si=findEmpByName(c.shiftIncharge),li=findEmpByName(c.lineIncharge);$('main').innerHTML=`<div class="backline"><button onclick="home()">←</button><div><b>${esc(shift)}</b><span>${shift==='A Shift'?'06:00 – 14:00':shift==='B Shift'?'14:00 – 22:00':'22:00 – 06:00'}</span></div><button onclick="home()">⌂</button></div><div class="crew-card"><h3>${currentShift()===shift?'🟢 ACTIVE SHIFT':'Shift'} Crew</h3><p><b>Shift In-charge:</b> ${esc(c.shiftIncharge||'Not entered')} ${si?.mobile?`• 📱 ${esc(si.mobile)}`:''}</p><p><b>Line In-charge:</b> ${esc(c.lineIncharge||'Not entered')} ${li?.mobile?`• 📱 ${esc(li.mobile)}`:''}</p><p><b>Crew:</b> TOTAL ${c.totalCrew||0} (BSL: ${c.bslEmployees||0}, Contract: ${c.contractWorkers||0})</p></div><div class="entry-tabs"><button class="active" onclick="newEntry('${esc(shift)}')">Add Log</button><button onclick="reportsFor('${esc(shift)}')">View Reports</button></div>`}
 function reportsFor(s){selectedShift=s;reports()}
 async function dashboard(){closeDrawer();setHeader('Dashboard','Today');$('main').innerHTML='<div class="loading">Loading...</div>';let r=await api('dashboard',{},'GET');$('main').innerHTML=`<div class="stats-grid"><div class="stat-card"><span>Total Logs</span><b>${r.total||0}</b></div><div class="stat-card"><span>Completed</span><b>${r.completed||0}</b></div><div class="stat-card"><span>Pending</span><b>${r.pending||0}</b></div><div class="stat-card"><span>Overlook</span><b>${r.overlook||0}</b></div></div><div class="card"><h3>Active Shift</h3><p>${esc(r.currentShift)}</p><p><b>Shift In-charge:</b> ${esc(r.shiftIncharge||'')}</p><p><b>Line In-charge:</b> ${esc(r.lineIncharge||'')}</p><p><b>Crew:</b> TOTAL ${r.totalCrew||0} (BSL ${r.bslEmployees||0}, Contract ${r.contractWorkers||0})</p></div>`}
